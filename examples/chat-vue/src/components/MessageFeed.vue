@@ -36,7 +36,7 @@ useSukkoEvent("error", (err) => {
 useSukkoEvent("publishError", (err) => {
 	emit("message", {
 		id: createMessageId(),
-		channel: err.channel ?? "",
+		channel: "",
 		sender: "system",
 		text: `Publish error: ${err.message ?? "Failed to publish"}`,
 		ts: Date.now(),
@@ -82,7 +82,7 @@ useSukkoEvent("authError", (err) => {
 		id: createMessageId(),
 		channel: "",
 		sender: "system",
-		text: `Auth error: ${err.message ?? "Token refresh failed"}`,
+		text: `Auth error: ${err.data.message ?? "Token refresh failed"}`,
 		ts: Date.now(),
 		type: "error",
 	});

@@ -49,13 +49,14 @@ export function ChannelSidebar(props: {
 }) {
 	const client = useSukkoClient();
 	const claims = useMemo(() => decodeTokenPayload(props.token), [props.token]);
+	const tenant = claims.tenant_id ?? "sukko";
 
-	const publicChannels = ["all.trade"];
-	const userChannels = claims.sub ? [`notifications.${claims.sub}`] : [];
+	const publicChannels = [`${tenant}.general.messages`];
+	const userChannels = claims.sub ? [`${tenant}.inbox.${claims.sub}`] : [];
 	const availableGroups = claims.groups ?? [];
 	const [joinedGroups, setJoinedGroups] = useState<string[]>([]);
 
-	const allSubscribed = [...publicChannels, ...userChannels, ...joinedGroups.map((g) => `community.${g}`)];
+	const allSubscribed = [...publicChannels, ...userChannels, ...joinedGroups.map((g) => `${tenant}.rooms.${g}`)];
 
 	// Auto-select first channel
 	useEffect(() => {
@@ -71,7 +72,7 @@ export function ChannelSidebar(props: {
 	};
 
 	const handleLeaveGroup = (group: string) => {
-		const channel = `community.${group}`;
+		const channel = `${tenant}.rooms.${group}`;
 		client.unsubscribe([channel]);
 		setJoinedGroups((prev) => prev.filter((g) => g !== group));
 		if (props.selectedChannel === channel) {
@@ -112,7 +113,7 @@ export function ChannelSidebar(props: {
 			<div className="channel-section">
 				<div className="channel-section-title">Groups</div>
 				{availableGroups.map((group) => {
-					const channel = `community.${group}`;
+					const channel = `${tenant}.rooms.${group}`;
 					const joined = joinedGroups.includes(group);
 
 					if (joined) {
@@ -131,7 +132,7 @@ export function ChannelSidebar(props: {
 					return (
 						<div key={group} className="channel-item">
 							<span className="channel-name" style={{ color: "#8b949e" }}>
-								community.{group}
+								{`${tenant}.rooms.${group}`}
 							</span>
 							<button type="button" onClick={() => handleJoinGroup(group)}>
 								Join
